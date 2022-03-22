@@ -1,10 +1,16 @@
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const { findOne } = require("../models/adminModel");
 const Admin = require("../models/adminModel");
 const AppError = require("../utils/appError");
 
 exports.signUp = async (req, res, next) => {
   try {
+    const email = req.body.email;
+
+    const user = await Admin.findOne({ email });
+    if (user) return next(new AppError("this email is already exist ", 404));
+
     const newAdmin = await Admin.create({
       email: req.body.email,
       password: req.body.password,
